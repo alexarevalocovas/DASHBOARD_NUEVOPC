@@ -5,6 +5,7 @@ import {MatDialog, MatTabGroup} from '@angular/material';
 import {Location} from '@angular/common';
 import {MatTableDataSource} from '@angular/material/table';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 
 
 // tslint:disable-next-line:max-line-length
@@ -12,7 +13,8 @@ import {  Nivel, Alumno, Equipo, Juego, JuegoDeCompeticion, Punto, TablaPuntosFo
 
           AlumnoJuegoDePuntos, EquipoJuegoDePuntos, Grupo, AlumnoJuegoDeCompeticionLiga,
           EquipoJuegoDeCompeticionLiga, Jornada, AlumnoJuegoDeCompeticionFormulaUno,
-          EquipoJuegoDeCompeticionFormulaUno, Cuestionario, JuegoDeAvatar, FamiliaAvatares,
+          EquipoJuegoDeCompeticionFormulaUno,AlumnoJuegoDeCompeticionTorneo,
+          EquipoJuegoDeCompeticionTorneo, Cuestionario, JuegoDeAvatar, FamiliaAvatares,
           AlumnoJuegoDeAvatar, AsignacionPuntosJuego, Coleccion, AlumnoJuegoDeColeccion,
           EquipoJuegoDeColeccion, Escenario, JuegoDeGeocaching, AlumnoJuegoDeGeocaching, PuntoGeolocalizable,
           JuegoDeVotacionUnoATodos, AlumnoJuegoDeVotacionUnoATodos,
@@ -197,8 +199,18 @@ export class JuegoComponent implements OnInit {
     {nombre: 'Liga', color: 'primary'},
     {nombre: 'Fórmula Uno', color: 'warn'},
     {nombre: 'Torneo', color: 'accent'}
+  
   ];
+  tipoDeTorneoSeleccionado: string;
+  seleccionModeloTorneo: ChipColor[] = [
+    {nombre: 'Clásico', color: 'primary'},
+    {nombre: 'Doble Eliminación', color: 'warn'},
+    {nombre: 'Suizo', color: 'accent'}
+  ];
+  ParticipantesTorneo: Alumno[];
+  CuadroModificado= false;
   tengoTipoDeCompeticion = false;
+  tengoTipoDeTorneo = false;
   numeroDeJornadas: number;
   tengoNumeroDeJornadas = false;
   jornadasLiga: Jornada[];
@@ -303,6 +315,7 @@ export class JuegoComponent implements OnInit {
     this.grupo = this.sesion.DameGrupo();
     console.log (' Grupo ' + this.grupo);
     this.alumnosGrupo = this.sesion.DameAlumnosGrupo();
+    //this.ParticipantesTorneo = this.sesion.DameAlumnosGrupo();
     this.profesorId = this.sesion.DameProfesor().id;
     // La lista de equipos del grupo no esta en el servicio sesión. Asi que hay que
     // ir a buscarla
@@ -842,7 +855,7 @@ export class JuegoComponent implements OnInit {
   CrearJuegoDePuntos() {
     // primero creamos el juego
     this.peticionesAPI.CreaJuegoDePuntos(new Juego (this.tipoDeJuegoSeleccionado, this.modoDeJuegoSeleccionado,
-      undefined, undefined, undefined, undefined, undefined, undefined, undefined, this.nombreDelJuego), this.grupo.id)
+      undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, this.nombreDelJuego), this.grupo.id)
     .subscribe(juegoCreado => {
       this.juego = juegoCreado;
       this.sesion.TomaJuego(this.juego);
@@ -910,7 +923,7 @@ export class JuegoComponent implements OnInit {
 
   CrearJuegoDeColeccion() {
     this.peticionesAPI.CreaJuegoDeColeccion(new Juego (this.tipoDeJuegoSeleccionado, this.modoDeJuegoSeleccionado, this.modoAsignacion,
-      this.coleccionSeleccionada.id, undefined, undefined, undefined, undefined, undefined, this.nombreDelJuego), this.grupo.id)
+      this.coleccionSeleccionada.id, undefined, undefined, undefined, undefined, undefined, undefined, this.nombreDelJuego), this.grupo.id)
     .subscribe(juegoCreado => {
       this.juego = juegoCreado;
       console.log(juegoCreado);
@@ -1101,6 +1114,14 @@ export class JuegoComponent implements OnInit {
     this.tipoDeCompeticionSeleccionado = tipoCompeticion.nombre;
     this.tengoTipoDeCompeticion = true;
   }
+  TipoDeTorneoSeleccionado(tipoTorneo: ChipColor) {
+    this.tipoDeTorneoSeleccionado = tipoTorneo.nombre;
+    this.tengoTipoDeTorneo = true;
+  }
+  dropParticipantes(event: CdkDragDrop<any[]>) {
+    moveItemInArray(this.ParticipantesTorneo, event.previousIndex, event.currentIndex);
+    this.CuadroModificado = true;
+  }
 
   GuardarNumeroDeJornadas() {
     this.numeroDeJornadas = this.myForm.value.NumeroDeJornadas;
@@ -1196,8 +1217,7 @@ export class JuegoComponent implements OnInit {
 
     // tslint:disable-next-line:max-line-lengtholean)
     this.peticionesAPI.CreaJuegoDeCompeticionLiga(new Juego (this.tipoDeJuegoSeleccionado + ' ' + this.tipoDeCompeticionSeleccionado,
-                                                    this.modoDeJuegoSeleccionado, undefined, undefined, true, this.numeroDeJornadas,
-                                                    this.tipoDeCompeticionSeleccionado,
+                                                    this.modoDeJuegoSeleccionado, undefined, undefined, true, this.numeroDeJornadas, this.tipoDeCompeticionSeleccionado, undefined,
                                                     undefined, undefined, this.nombreDelJuego), this.grupo.id)
     .subscribe(juegoCreado => {
       this.juego = juegoCreado;
@@ -1251,7 +1271,7 @@ export class JuegoComponent implements OnInit {
   CrearJuegoDeCompeticionFormulaUno() {
     // tslint:disable-next-line:max-line-length
     this.peticionesAPI.CreaJuegoDeCompeticionFormulaUno(new Juego (this.tipoDeJuegoSeleccionado + ' ' + this.tipoDeCompeticionSeleccionado,
-                                                    this.modoDeJuegoSeleccionado, undefined, undefined, true, this.numeroDeJornadas,
+                                                    this.modoDeJuegoSeleccionado, undefined, undefined, true, this.numeroDeJornadas, undefined, 
                                                     undefined, this.Puntuacion.length,
                                                     this.Puntuacion, this.nombreDelJuego), this.grupo.id)
     .subscribe(juegoCreado => {
@@ -1296,10 +1316,80 @@ export class JuegoComponent implements OnInit {
       });
     });
   }
+  CrearCuadroTorneo(){
+    /*/
+    this.peticionesAPI.CreaJuegoDeCompeticionTorneo(new Juego (this.tipoDeJuegoSeleccionado + ' ' + this.tipoDeCompeticionSeleccionado,
+                                                    this.modoDeJuegoSeleccionado, undefined, undefined, true, this.numeroDeJornadas, this.tipoDeCompeticionSeleccionado, undefined,
+                                                    undefined, undefined, this.nombreDelJuego), this.grupo.id)
+     .subscribe(juegoCreado => {
+    this.juego = juegoCreado;
+    this.sesion.TomaJuego(this.juego);
+    this.juegoCreado = true;
+    /*/
+    console.log('Voy a calcular el cuadro del torneo');
+    if (this.modoDeJuegoSeleccionado === 'Individual') {
+
+        this.ParticipantesTorneo=this.calculos.calcularCuadro(this.alumnosGrupo);
+    }
+    else{
+        this.ParticipantesTorneo=this.calculos.calcularCuadro(this.equiposGrupo);
+    }
+    console.log('CUADRO',this.ParticipantesTorneo);
+  }
+  
+  CrearJuegoDeCompeticionTorneo() {
+
+    // tslint:disable-next-line:max-line-lengtholean)
+    console.log('voy a crear torneo');
+    let nuevojuego = new Juego (this.tipoDeJuegoSeleccionado + ' ' + this.tipoDeCompeticionSeleccionado,
+    this.modoDeJuegoSeleccionado, undefined, undefined, true, 3,
+    this.tipoDeCompeticionSeleccionado, this.tipoDeTorneoSeleccionado,
+    undefined, undefined, this.nombreDelJuego, undefined , undefined, undefined, undefined, this.profesorId, undefined);
+    console.log(nuevojuego);
+    this.peticionesAPI.CreaJuegoDeCompeticionTorneo(nuevojuego, this.grupo.id)
+    .subscribe(juegoCreado => {
+      console.log('voy a crear torneo 2');
+      this.juego = juegoCreado;
+      this.sesion.TomaJuego(this.juego);
+      this.juegoCreado = true;
+      this.calculos.EnfrentamientosTorneo(this.ParticipantesTorneo)
+      
+     
+      //Creamos el cuadro
+    
+        if (this.modoDeJuegoSeleccionado === 'Individual') {
+
+          // tslint:disable-next-line:prefer-for-of
+           for (let i = 0; i < this.alumnosGrupo.length; i++) {
+            // tslint:disable-next-line:max-line-length
+              this.peticionesAPI.InscribeAlumnoJuegoDeCompeticionTorneo(new AlumnoJuegoDeCompeticionTorneo(this.alumnosGrupo[i].id, this.juego.id))
+              .subscribe();
+            }
+        } else {
 
 
-
-  /// Funciones para craar juego de Geocatching
+          // tslint:disable-next-line:prefer-for-of
+            for (let i = 0; i < this.equiposGrupo.length; i++) {
+            // tslint:disable-next-line:max-line-length
+              this.peticionesAPI.InscribeEquipoJuegoDeCompeticionTorneo(new EquipoJuegoDeCompeticionTorneo(this.equiposGrupo[i].id, this.juego.id))
+              .subscribe();
+            }
+          }
+          Swal.fire('Juego de competición tipo Torneo creado correctamente', ' ', 'success');
+      // El juego se ha creado como activo. Lo añadimos a la lista correspondiente
+          if (this.juegosActivos === undefined) {
+        // Si la lista aun no se ha creado no podre hacer el push
+              this.juegosActivos = [];
+          }
+          this.juegosActivos.push (this.juego);
+          this.Limpiar();
+        // Regresamos a la lista de equipos (mat-tab con índice 0)
+          this.tabGroup.selectedIndex = 0;
+        });
+    
+  }
+  
+  /// Funciones para crear juego de Geocatching
   // Geocaching
   AbrirDialogoAgregarEscenario(): void {
     const dialogRef = this.dialog.open(AsignaEscenarioComponent, {
@@ -1721,6 +1811,7 @@ Limpiar() {
 
     this.tengoNumeroDeJornadas = false;
     this.tengoTipoDeCompeticion = false;
+    this.tengoTipoDeTorneo = false;
     this.tengoNuevaPuntuacion = false;
 
     this.puntuacionCorrectaGeo = undefined;

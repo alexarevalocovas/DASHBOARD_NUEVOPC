@@ -329,9 +329,11 @@ export class EditarJornadasJuegoDeCompeticionFormulaUnoComponent implements OnIn
         console.log(this.JuegoModificado);
       });
       Swal.fire('La nueva puntuación se ha guardado correctamente', '', 'success');
+      this.location.back();
     } else {
       Swal.fire('Esta competición ya ha empezado', 'No es posible modificar las puntuaciones', 'error');
     }
+    
   }
 
   JuegoEmpezado() {
@@ -355,7 +357,26 @@ export class EditarJornadasJuegoDeCompeticionFormulaUnoComponent implements OnIn
   }
 
   goBack() {
-    this.location.back();
+    if (this.dataSource !== this.sesion.DameTablaeditarPuntos()) {
+
+      Swal.fire({
+        title: '¿Seguro que quieres salir?',
+        text: 'Has hecho cambios que no has aceptado',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Si, estoy seguro'
+      }).then((result) => {
+        if (result.value) {
+          this.location.back();
+        }
+      });
+    } else {
+      this.location.back();
+    }
   }
+
+  
 
 }

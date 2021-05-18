@@ -116,6 +116,8 @@ import { GanadorJuegoDeCompeticionLigaComponent } from './paginas/juego-seleccio
 // tslint:disable-next-line:max-line-length
 import { JuegoDeCompeticionFormulaUnoSeleccionadoActivoComponent } from './paginas/juego-seleccionado-activo/juego-de-competicion-formula-uno-seleccionado-activo/juego-formula-uno-seleccionado-activo.component';
 // tslint:disable-next-line:max-line-length
+import { JuegoDeCompeticionTorneoSeleccionadoActivoComponent } from './paginas/juego-seleccionado-activo/juego-de-competicion-torneo-seleccionado-activo/juego-de-competicion-torneo-seleccionado-activo.component';
+// tslint:disable-next-line:max-line-length
 import { JuegoDeCompeticionFormulaUnoSeleccionadoInactivoComponent } from './paginas/juego-seleccionado-inactivo/juego-de-competicion-formula-uno-seleccionado-inactivo/juego-formula-uno-seleccionado-inactivo.component';
 // tslint:disable-next-line:max-line-length
 import { InformacionJuegoDeCompeticionFormulaUnoComponent } from './paginas/juego-seleccionado-activo/juego-de-competicion-formula-uno-seleccionado-activo/informacion-juego-formula-uno/informacion-juego-formula-uno.component';
@@ -325,6 +327,7 @@ import { GestionPreguntaKahootComponent } from './paginas/juego-seleccionado-act
 
     GanadorJuegoDeCompeticionLigaComponent,
     JuegoDeCompeticionFormulaUnoSeleccionadoActivoComponent,
+    JuegoDeCompeticionTorneoSeleccionadoActivoComponent,
     InformacionJuegoDeCompeticionFormulaUnoComponent,
     GanadoresJuegoDeCompeticionFormulaUnoComponent,
     EditarJornadasJuegoDeCompeticionFormulaUnoComponent,

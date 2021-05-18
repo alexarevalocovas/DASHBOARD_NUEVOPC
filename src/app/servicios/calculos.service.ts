@@ -3,7 +3,7 @@ import { SesionService, PeticionesAPIService} from './index';
 import { Grupo, Equipo, Juego, Alumno, Nivel, TablaAlumnoJuegoDePuntos, TablaHistorialPuntosAlumno, AlumnoJuegoDePuntos,
          TablaEquipoJuegoDePuntos, HistorialPuntosAlumno, HistorialPuntosEquipo, EquipoJuegoDePuntos, TablaHistorialPuntosEquipo,
          AlumnoJuegoDeColeccion, Album, Coleccion, EquipoJuegoDeColeccion, AlbumEquipo, Cromo, TablaJornadas, TablaAlumnoJuegoDeCompeticion,
-         TablaEquipoJuegoDeCompeticion, Jornada, EquipoJuegoDeCompeticionLiga, EnfrentamientoLiga, InformacionPartidosLiga,
+         TablaEquipoJuegoDeCompeticion, Jornada, EquipoJuegoDeCompeticionLiga, EnfrentamientoLiga, EnfrentamientoTorneo, InformacionPartidosLiga,
          AlumnoJuegoDeCompeticionLiga, AlumnoJuegoDeCompeticionFormulaUno, EquipoJuegoDeCompeticionFormulaUno,
          // tslint:disable-next-line:max-line-length
          TablaClasificacionJornada, TablaPuntosFormulaUno, AlumnoJuegoDeVotacionUnoATodos, TablaAlumnoJuegoDeVotacionUnoATodos,
@@ -44,6 +44,12 @@ export class CalculosService {
   AlumnoJuegoDeCompeticionLigaId: number;
   EquipoJuegoDeCompeticionLigaId: number;
   empateAsignado = 0;
+  JornadasTorneo: number;
+  numPartidosPorRonda: Array<number>;
+  numParticipantes: number;
+  participantesB2: number;
+  INTparticipantesB2: number;
+  booleano: boolean;
 
   constructor(
     private sesion: SesionService,
@@ -549,6 +555,21 @@ export class CalculosService {
                   juegosInactivos.push(juegosCompeticionFormulaUno[i]);
                 }
               }
+              // ahora toca los juegos de competicion de torneo
+            console.log ('vamos a por los juegos de competicion torneo del grupo: ' + grupoID);
+            this.peticionesAPI.DameJuegoDeCompeticionTorneoGrupo(grupoID)
+            .subscribe(juegosCompeticionTorneo => {
+              console.log('He recibido los juegos de competición torneo');
+              console.log(juegosCompeticionTorneo);
+              // tslint:disable-next-line:prefer-for-of
+              for (let i = 0; i < juegosCompeticionTorneo.length; i++) {
+                if (juegosCompeticionTorneo[i].JuegoActivo === true) {
+                  juegosActivos.push(juegosCompeticionTorneo[i]);
+                } else {
+                  juegosInactivos.push(juegosCompeticionTorneo[i]);
+                }
+              }
+            
               console.log ('vamos a por los juegos de avatar del grupo: ' + grupoID);
               this.peticionesAPI.DameJuegoDeAvatarGrupo(grupoID)
               .subscribe(juegosAvatar => {
@@ -674,6 +695,7 @@ export class CalculosService {
             });
           });
         });
+      });
       });
     });
 
@@ -807,6 +829,7 @@ export class CalculosService {
     });
     return rankingObservable;
   }
+
 
 
   public DameRankingPuntoSeleccionadoAlumnos(
@@ -1617,6 +1640,8 @@ public CrearJornadasLiga(NumeroDeJornadas, juegoDeCompeticionID): any  {
     });
     return jornadasObservables;
   }
+
+
   public ObtenerNombreGanadoresFormulaUno(juegoSeleccionado: Juego, jornada, alumnoJuegoDeCompeticionFormulaUno,
                                           equipoJuegoDeCompeticionFormulaUno) {
     console.log('Estoy en ObtenerNombreGanadoresFormulaUno()');
@@ -2022,7 +2047,67 @@ public CrearJornadasLiga(NumeroDeJornadas, juegoDeCompeticionID): any  {
           this.guardarenfrentamientos(this.rondas, NumeroDeJornadas, participantes, Jornadas);
           console.log('Enrentaminetos guardados');
   }
+  
+DesordenarVector(vector: any[]) {
 
+  // genera una permutación aleatoria de los elementos del vector
+
+ 
+
+  let currentIndex = vector.length;
+
+  let temporaryValue;
+
+  let randomIndex;
+
+  // While there remain elements to shuffle...
+
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+
+    randomIndex = Math.floor(Math.random() * currentIndex);
+
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+
+    temporaryValue = vector[currentIndex];
+
+    vector[currentIndex] = vector[randomIndex];
+
+    vector[randomIndex] = temporaryValue;
+
+  }
+
+  console.log ('he terminado');
+
+}
+  public calcularCuadro(participantes: any) : any[] {
+
+    console.log('Voy a calcular el cuadro del torneo');
+    this.booleano=false;
+    while (this.booleano==false) {
+      this.numParticipantes=participantes.length;
+      this.participantesB2=Math.log2(this.numParticipantes)
+      this.INTparticipantesB2=Math.floor(this.participantesB2);
+      if((this.participantesB2-this.INTparticipantesB2) !=0) {
+        participantes.push(undefined);
+      }
+      else{
+        this.booleano=true;
+      }
+    }
+    this.DesordenarVector(participantes);
+    this.numParticipantes=participantes.length;
+    this.JornadasTorneo= Math.log2(this.numParticipantes);
+    console.log ('Numero de jornadas' + this.JornadasTorneo);
+    console.log ('Participantes');
+    console.log (participantes);
+    return participantes;
+    
+  
+  }
   public guardarenfrentamientos(rondas: Array<Array<EnfrentamientoLiga>>, NumeroDeJornadas: number,
                                 participantes: any[], jornadas: Jornada[]) {
 
@@ -2059,6 +2144,26 @@ public CrearJornadasLiga(NumeroDeJornadas, juegoDeCompeticionID): any  {
       }
     }
   }
+
+   public EnfrentamientosTorneo(participantes: any[]) {
+
+    const numEnfrentamientos = participantes.length / 2;
+    let EnfrentamientosTorneo: EnfrentamientoTorneo[];
+    for (let i = 0, j= 0; i < numEnfrentamientos ; i++,j=j+2) {
+     
+      EnfrentamientosTorneo[i]= new EnfrentamientoTorneo (participantes[j].id, participantes[j+1].id);
+
+    }
+    this.peticionesAPI.CrearEnfrentamientoTorneo(EnfrentamientosTorneo)
+    .subscribe(enfrentamientocreado => {
+    console.log('enfrentamiento creado');
+    console.log(enfrentamientocreado);
+    });
+    
+  }
+
+
+  
 
   public DameTablaeditarPuntos(juegoSeleccionado: Juego) {
     this.TablaeditarPuntos = [];

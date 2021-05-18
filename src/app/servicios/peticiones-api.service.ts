@@ -8,8 +8,8 @@ import { Profesor, Grupo, Alumno, Matricula, Juego, Punto, Nivel, AlumnoJuegoDeP
         Equipo, AsignacionEquipo, AsignacionPuntosJuego, EquipoJuegoDePuntos, Coleccion,
         AlumnoJuegoDeColeccion, EquipoJuegoDeColeccion, Cromo, HistorialPuntosAlumno, HistorialPuntosEquipo,
         Album, AlbumEquipo, Insignia, AlumnoJuegoDeCompeticionLiga, EquipoJuegoDeCompeticionLiga,
-        Jornada, EnfrentamientoLiga, Pregunta,  PreguntaDelCuestionario, Cuestionario, AlumnoJuegoDeCompeticionFormulaUno,
-        EquipoJuegoDeCompeticionFormulaUno, SesionClase, AsistenciaClase, FamiliaAvatares, JuegoDeAvatar,
+        Jornada, EnfrentamientoLiga, EnfrentamientoTorneo, Pregunta,  PreguntaDelCuestionario, Cuestionario, AlumnoJuegoDeCompeticionFormulaUno,
+        EquipoJuegoDeCompeticionFormulaUno, AlumnoJuegoDeCompeticionTorneo, EquipoJuegoDeCompeticionTorneo, SesionClase, AsistenciaClase, FamiliaAvatares, JuegoDeAvatar,
         AlumnoJuegoDeAvatar, JuegoDeCuestionario, AlumnoJuegoDeCuestionario,
         RespuestaJuegoDeCuestionario, JuegoDeVotacionUnoATodos, AlumnoJuegoDeVotacionUnoATodos, Rubrica,
         JuegoDeVotacionTodosAUno, AlumnoJuegoDeVotacionTodosAUno, FamiliaDeImagenesDePerfil,
@@ -73,6 +73,10 @@ export class PeticionesAPIService {
   private APIUrlAlumnoJuegoDeCompeticionFormulaUno = this.host + ':3000/api/AlumnosJuegoDeCompeticionFormulaUno';
   private APIUrlEquipoJuegoDeCompeticionFormulaUno = this.host + ':3000/api/EquiposJuegoDeCompeticionFormulaUno';
   private APIUrlJornadasJuegoDeCompeticionFormulaUno = this.host + ':3000/api/JornadasDeCompeticionFormulaUno';
+  private APIUrlJuegoDeCompeticionTorneo = this.host + ':3000/api/juegosDeCompeticionTorneo';
+  private APIUrlEnfrentamientosTorneo = this.host + ':3000/api/EnfrentamientosTorneo';
+  private APIUrlAlumnoJuegoDeCompeticionTorneo = this.host + ':3000/api/AlumnosJuegoDeCompeticionTorneo';
+  private APIUrlEquipoJuegoDeCompeticionTorneo = this.host + ':3000/api/EquiposJuegoDeCompeticionTorneo';
   private APIUrlJuegoDeGeocaching = this.host + ':3000/api/JuegosDeGeocaching';
 
   private APIUrlAsistenciasClase = this.host + ':3000/api/AsistenciasClase';
@@ -1025,7 +1029,23 @@ export class PeticionesAPIService {
     return this.http.put<EquipoJuegoDeCompeticionFormulaUno>(this.APIUrlEquipoJuegoDeCompeticionFormulaUno + '/' + equipo.id, equipo);
   }
 
+//////////////////////////////////////// GESTION JUEGO COMPETICION TORNEO ///////////////////////////////////////
 
+public CreaJuegoDeCompeticionTorneo(juego: Juego, grupoId: number): Observable<Juego> {
+  return this.http.post<Juego>(this.APIUrlGrupos + '/' + grupoId + '/juegosDeCompeticionTorneo', juego);
+}
+public CrearEnfrentamientoTorneo(enfrentamiento: EnfrentamientoTorneo[]): Observable<EnfrentamientoTorneo[]> {
+  return this.http.post<EnfrentamientoTorneo[]>(this.APIUrlEnfrentamientosTorneo, enfrentamiento);
+}
+public InscribeAlumnoJuegoDeCompeticionTorneo(alumnoJuegoDeCompeticionTorneo: AlumnoJuegoDeCompeticionTorneo) {
+  return this.http.post<AlumnoJuegoDeCompeticionTorneo>(this.APIUrlAlumnoJuegoDeCompeticionTorneo, alumnoJuegoDeCompeticionTorneo);
+}
+public InscribeEquipoJuegoDeCompeticionTorneo(equipoJuegoDeCompeticionTorneo: EquipoJuegoDeCompeticionTorneo) {
+  return this.http.post<EquipoJuegoDeCompeticionTorneo>(this.APIUrlEquipoJuegoDeCompeticionTorneo, equipoJuegoDeCompeticionTorneo);
+}
+public DameJuegoDeCompeticionTorneoGrupo(grupoId: number): Observable<Juego[]> {
+  return this.http.get<Juego[]>(this.APIUrlGrupos + '/' + grupoId + '/JuegosDeCompeticionTorneo');
+}
 /////////////////////////////// GESTION DE PREGUNTAS /////////////////////////////
 
   public CreaPregunta(pregunta: Pregunta, profesorId: number): Observable<Pregunta> {

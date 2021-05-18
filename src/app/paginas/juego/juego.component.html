@@ -635,8 +635,9 @@
                   <button [disabled]="!tengoTipoDeCompeticion" type="button" class="btn Next" matStepperNext>Siguiente</button>
                 </div>
             </mat-step>
-            <!-- CUARTO PASO: NUMERO DE JORNADAS-->
-            <mat-step>
+            <!-- CUARTO PASO si es liga o fórmula uno: NUMERO DE JORNADAS-->
+            <div *ngIf="tipoDeCompeticionSeleccionado === 'Liga' || tipoDeCompeticionSeleccionado === 'Fórmula Uno'">
+              <mat-step>
                     <ng-template matStepLabel><div>Jornadas</div></ng-template>
 
                         <!-- casilla para introducir jornadas -->
@@ -650,7 +651,8 @@
                       </div>
 
 
-            </mat-step>
+              </mat-step>
+            </div>
             <!--Ultimo paso, en el caso de una liga: finalizamos-->
             <div *ngIf="tipoDeCompeticionSeleccionado === 'Liga'">
               <mat-step>
@@ -753,6 +755,65 @@
              </mat-step>
             </div>
 
+              <!--Cuarto paso, en el caso torneo: modelo de torneo-->
+               
+            <div *ngIf="tipoDeCompeticionSeleccionado === 'Torneo'">
+              <mat-step>
+                <ng-template matStepLabel><div>Modelo Torneo</div></ng-template>
+
+                <div class = "colorsChips">
+
+                  <label class = "LabelStepper">Selecciona un modelo de torneo para el juego:</label>
+                  <mat-chip-list class="mat-chip-list-stacked">
+                    <mat-chip style = "width: 150px" *ngFor="let tipo of seleccionModeloTorneo; let i = index" selected [color]="tipo.color"  selected="{{seleccionModeloTorneo[i].selected}}"
+                       (click)="TipoDeTorneoSeleccionado(seleccionModeloTorneo[i])" [value]="tipo.nombre" [selectable]="true">
+                        {{tipo.nombre}}
+                    </mat-chip>
+                  </mat-chip-list>
+                  <span style ="font-weight: bold;color:green;"> Has elegido ... {{tipoDeJuegoSeleccionado}} ... {{tipoDeCompeticionSeleccionado}} ... {{tipoDeTorneoSeleccionado}}</span>
+                </div>
+              <div class="btnCambiarStep">
+                <button type="button" class="btn Back" matStepperPrevious>Atrás</button>
+                <button type="button" class="btn Aceptar"(click) = "CrearCuadroTorneo()" matStepperNext>Siguiente</button>
+              </div>
+              </mat-step>
+            
+               <!-- QUINTO PASO en torneo: Emparejamientos -->
+             
+              <mat-step>
+                <ng-template matStepLabel><div>Emparejamientos Torneo</div></ng-template>
+
+                <div class = "enColumna">
+
+                  <label class = "LabelStepper">Ordena los participantes para organizar el cuadro del torneo de forma que el primero competirá con el segundo, el tercero con el cuarto, etc:</label>
+                  <div cdkDropList class="example-list" (cdkDropListDropped)="dropParticipantes($event)">
+                    <div class="example-box" *ngFor="let participante of ParticipantesTorneo; let i = index" cdkDrag>
+                     <span *ngIf="participante!==undefined" >
+                      <span style="border-image: initial; border: 1px solid black;">{{participante.nombre}} {{participante.PrimerApellido}} {{participante.SegundoApellido}}</span> <br><br> 
+                    </span> 
+                    <span *ngIf="participante==undefined" >
+                      <span style="border-image: initial; border: 1px solid black;">Jugador Fantasma</span><br><br>
+                    </span> 
+                    </div>
+                  </div>
+                </div>
+                <div class="btnCambiarStep">
+                  <button type="button" class="btn Back" matStepperPrevious>Atrás</button>
+                  <button type="button" class="btn Aceptar" matStepperNext>Siguiente></button>
+                </div>
+              </mat-step>
+               <!-- Ultimo PASO en torneo: Finalizar juego torneo -->
+              <mat-step>
+                <ng-template matStepLabel><div>Finalizar</div></ng-template>
+
+                <div class="btnCambiarStep">
+                  <button type="button" class="btn Back" matStepperPrevious>Atrás</button>
+                  <button style= "width: 60%" type="button" class="btn Aceptar" (click) = "CrearJuegoDeCompeticionTorneo()">Crear juego de competicion Torneo</button>
+                </div>
+              </mat-step>
+            </div>
+
+    
             <!-- <mat-step>
                     <ng-template matStepLabel>Finalizar</ng-template>
 
